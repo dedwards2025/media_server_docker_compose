@@ -160,7 +160,7 @@ services:
   cloudflared:
     image: cloudflare/cloudflared:latest
     restart: unless-stopped
-    command: tunnel --no-autoupdate run --token eyJhIjoiMTc0YmNhNTY4NDNkMGY2OTlhMDM0ZDQ2MDQ3MGIyZTIiLCJ0IjoiOTllZTNmMGUtYjI0ZS00MWJkLWFjODAtNzI2OGNjNTcwNmI0IiwicyI6IlpXSmlPV1EyTkRndE5qa3lOaTAwWWprMUxXSTNaV1F0TWpZNE1qSTFZalE0T0dNMCJ9
+    command: tunnel --no-autoupdate run --token
     networks:
       - synobridge
 
