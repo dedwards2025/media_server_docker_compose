@@ -1,0 +1,171 @@
+services:
+  sonarr:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - UMASK=022
+    volumes:
+      - /mnt/data/docker/sonarr:/config
+      - /mypool/data/usenet:/data/usenet
+    ports:
+      - 8989:8989/tcp
+    networks:
+      - synobridge
+    security_opt:
+      - no-new-privileges:true
+    restart: always
+
+  radarr:
+    image: linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - UMASK=022
+    volumes:
+      - /mnt/data/docker/radarr:/config
+      - /mypool/data/usenet:/data/usenet
+    ports:
+      - 7878:7878/tcp
+    networks:
+      - synobridge
+    security_opt:
+      - no-new-privileges:true
+    restart: always
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - UMASK=022
+    volumes:
+      - /mnt/data/docker/prowlarr:/config
+      - /mypool/data/usenet:/data/usenet
+    ports:
+      - 9696:9696/tcp
+    networks:
+      - synobridge
+    security_opt:
+      - no-new-privileges:true
+    restart: always
+
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - VERSION=docker
+      - PLEX_CLAIM=claim-XNv5sbMsLhpA-cE_3yJT
+    volumes:
+      - /mnt/data/docker/plex:/config
+      - /mypool/data/media/tv:/tv
+      - /mypool/data/media/movies:/movies
+    ports:
+      - "32400:32400"
+    restart: unless-stopped
+    networks:
+      - synobridge
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  sabnzbd:
+    image: linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - /mnt/data/docker/sabnzbd:/config
+      - /mypool/data/usenet:/data/usenet
+    ports:
+      - 7654:8080/tcp
+    networks:
+      - synobridge
+    security_opt:
+      - no-new-privileges:true
+    restart: always
+
+  unmanic:
+    container_name: unmanic
+    image: josh5/unmanic:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - NVIDIA_VISIBLE_DEVICES=all # Use "all" or specify GPU ID
+    volumes:
+      - /mnt/data/docker/unmanic/config:/config
+      - /mypool/data/media/tv:/tv
+      - /mypool/data/media/movies:/movies
+      - /mypool/data/projects/unmanic-cache:/tmp/unmanic
+    ports:
+      - 8888:8888
+    networks:
+      - synobridge
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  overseerr:
+    image: sctx/overseerr:latest
+    container_name: overseerr
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=America/New_York
+      - PORT=5055
+    ports:
+      - 5055:5055
+    volumes:
+      - /mnt/data/docker/overseerr/config:/app/config
+    restart: unless-stopped
+    networks:
+      - synobridge
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - /mnt/data/docker/bazarr/config:/config
+      - /mypool/data/media/movies:/movies
+      - /mypool/data/media/tv:/tv
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+    networks:
+      - synobridge
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token eyJhIjoiMTc0YmNhNTY4NDNkMGY2OTlhMDM0ZDQ2MDQ3MGIyZTIiLCJ0IjoiOTllZTNmMGUtYjI0ZS00MWJkLWFjODAtNzI2OGNjNTcwNmI0IiwicyI6IlpXSmlPV1EyTkRndE5qa3lOaTAwWWprMUxXSTNaV1F0TWpZNE1qSTFZalE0T0dNMCJ9
+    networks:
+      - synobridge
+
+networks:
+  synobridge:
+    external: true
+
+
