@@ -64,7 +64,7 @@ services:
       - PGID=1000
       - TZ=America/New_York
       - VERSION=docker
-      - PLEX_CLAIM=claim-XNv5sbMsLhpA-cE_3yJT
+      - PLEX_CLAIM=claim-
     volumes:
       - /mnt/data/docker/plex:/config
       - /mypool/data/media/tv:/tv
