@@ -111,7 +111,7 @@ services:
       - /mnt/data/docker/unmanic/config:/config
       - /mypool/data/media/tv:/tv
       - /mypool/data/media/movies:/movies
-      - /mypool/data/projects/unmanic-cache:/tmp/unmanic
+      - /mypool/data/docker/projects/unmanic-cache:/tmp/unmanic
     ports:
       - 8888:8888
     networks:

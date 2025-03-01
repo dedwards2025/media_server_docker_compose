@@ -1,0 +1,47 @@
+services:
+  unifi-network-application:
+    image: lscr.io/linuxserver/unifi-network-application:latest
+    container_name: unifi-network-application
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=American/New_York
+      - MONGO_USER=unifi
+      - MONGO_PASS=
+      - MONGO_HOST=unifi-db
+      - MONGO_PORT=27017
+      - MONGO_DBNAME=unifi
+      - MONGO_AUTHSOURCE=admin
+      - MEM_LIMIT=1024
+      - MEM_STARTUP=1024
+     # - MONGO_TLS=  # optional
+    volumes:
+      - /local/docker/unifi/data:/config
+    ports:
+      - 8443:8443       # Controller UI / API
+      - 3478:3478/udp   # STUN
+      - 10001:10001/udp # Device discovery
+      - 8080:8080       # Device/controller communication
+      - 1900:1900/udp   # SSDP (optional)
+      - 8843:8843       # HTTPS portal (optional)
+      - 8880:8880       # HTTP portal (optional)
+      - 6789:6789       # Speed test (optional)
+      - 5514:5514/udp   # Syslog (optional)
+    restart: unless-stopped
+
+  unifi-db:
+    image: mongo:6.0  # Specify version explicitly
+    container_name: unifi-db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=
+      - MONGO_USER=unifi
+      - MONGO_PASS=
+      - MONGO_DBNAME=unifi
+      - MONGO_AUTHSOURCE=admin
+    ports:
+      - 27017:27017  # Expose externally (secure with firewall)
+    volumes:
+      - /local/docker/unifi/db/data:/data/db
+      - /local/docker/unifi/container-vars.env/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
+    restart: unless-stopped
