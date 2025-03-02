@@ -1,10 +1,10 @@
 services:
 
   gitlab:
-    image: gitlab/gitlab-ce:latest  # ARM64-compatible GitLab CE
+    image: gitlab/gitlab-ce:latest
     container_name: gitlab
     restart: always
-    hostname: 'gitlab.etherealpulse.dev'  # Replace with your actual domain
+    hostname: 'gitlab.etherealpulse.dev'
     environment:
       GITLAB_OMNIBUS_CONFIG: |
         external_url 'https://gitlab.ethrealpulse.dev'
@@ -20,8 +20,8 @@ services:
         nginx['real_ip_header'] = 'CF-Connecting-IP'
         gitlab_rails['gitlab_shell_ssh_port'] = 10022  # Git over SSH
     ports:
-      - '80:80'      # HTTP for Cloudflare Tunnel
-      - '10022:22'   # Git over SSH (Cloudflare Tunnel required)
+      - '80:80'
+      - '10022:22'
     volumes:
       - /mnt/data/docker/gitlab/config:/etc/gitlab
       - //mnt/data/docker/gitlab/logs:/var/log/gitlab
