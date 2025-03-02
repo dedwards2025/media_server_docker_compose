@@ -1,0 +1,35 @@
+services:
+
+  gitlab:
+    image: gitlab/gitlab-ce:latest  # ARM64-compatible GitLab CE
+    container_name: gitlab
+    restart: always
+    hostname: 'gitlab.etherealpulse.dev'  # Replace with your actual domain
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.ethrealpulse.dev'
+        nginx['listen_port'] = 80
+        nginx['listen_https'] = false
+        nginx['real_ip_trusted_addresses'] = [
+          '173.245.48.0/20', '103.21.244.0/22', '103.22.200.0/22',
+          '103.31.4.0/22', '141.101.64.0/18', '108.162.192.0/18',
+          '190.93.240.0/20', '188.114.96.0/20', '197.234.240.0/22',
+          '198.41.128.0/17', '162.158.0.0/15', '104.16.0.0/13',
+          '104.24.0.0/14', '172.64.0.0/13', '131.0.72.0/22'
+        ]
+        nginx['real_ip_header'] = 'CF-Connecting-IP'
+        gitlab_rails['gitlab_shell_ssh_port'] = 10022  # Git over SSH
+    ports:
+      - '80:80'      # HTTP for Cloudflare Tunnel
+      - '10022:22'   # Git over SSH (Cloudflare Tunnel required)
+    volumes:
+      - /mnt/data/docker/gitlab/config:/etc/gitlab
+      - //mnt/data/docker/gitlab/logs:/var/log/gitlab
+      - /mnt/data/docker/gitlab/data:/var/opt/gitlab
+    shm_size: '256m'
+
+  cloudflared-gitlab:
+    image: cloudflare/cloudflared:latest
+    container_name: gitlab-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token eyJhIjoiMTc0YmNhNTY4NDNkMGY2OTlhMDM0ZDQ2MDQ3MGIyZTIiLCJ0IjoiYTdiMDZhZTgtMzRjZS00NzZlLTkzZTItZmYwNzhhYzgzOTBkIiwicyI6IllqVTVaakZpWWpZdFpEbGtZUzAwTUdKa0xUa3hPVFF0WW1Sak9HVTJaV0ptTUdWaSJ9
